@@ -1,0 +1,47 @@
+PROJECT(RAZOREDGE)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+set( CMAKE_BUILD_TYPE Release )
+#set(CMAKE_CXX_FLAGS "-std=c++11")
+set( CMAKE_CXX_FLAGS "-std=c++11 -O3" )
+#set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+#set(VTK_LEGACY_SILENT:BOOL ON)
+
+ADD_SUBDIRECTORY(src bin)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/ann_1.1.2/include)
+
+list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules )
+find_package( G2O )
+include_directories( ${G2O_INCLUDE_DIRS} ) 
+find_package(Eigen3 REQUIRED) 
+find_package(CSparse REQUIRED) 
+find_package(Cholmod REQUIRED) 
+include_directories(${CSPARSE_INCLUDE_DIR}) 
+include_directories(${EIGEN3_INCLUDE_DIR}) 
+include_directories(${CHOLMOD_INCLUDE_DIR})
+#set( G2O_LIBS g2o_core g2o_types_sba g2o_solver_csparse g2o_stuff g2o_csparse_extension)
+SET(G2O_LIBS  GL GLU cholmod g2o_cli g2o_core g2o_incremental g2o_interactive g2o_interface  g2o_parser g2o_solver_cholmod g2o_solver_csparse g2o_solver_dense g2o_solver_pcg g2o_stuff g2o_types_icp g2o_types_sba g2o_types_sim3 g2o_types_slam2d g2o_types_slam3d ${QT_LIBRARIES} ${QT_QTOPENGL_LIBRARY} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${OpenCV_LIBS})
+
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON ) 
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
+#set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} $ENV{HOME}/freenect2/lib/cmake/freenect2)
+
+find_package(PCL 1.8 REQUIRED)
+find_package(OpenCV REQUIRED)
+#find_package(freenect2 REQUIRED)
+#find_package(Eigen3 REQUIRED)
+#FIND_PACKAGE(PkgConfig)
+
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS} ${PROJECT_SOURCE_DIR}/ann_1.1.2/lib ${PROJECT_SOURCE_DIR}/lib)
+add_definitions(${PCL_DEFINITIONS})
+
+#include_directories("/usr/include/libusb-1.0/")
+#include_directories(${freenect2_INCLUDE_DIR})
+
+SET(SRC_LIST main.cpp)
+#MESSAGE(STATUS "This is BINARY dir " ${SUTUNGPO_BINARY_DIR})
+#MESSAGE(STATUS "This is SOURCE dir " ${SUTUNGPO_SOURCE_DIR})
+ADD_EXECUTABLE(RazorEdge ${SRC_LIST})
+target_link_libraries(RazorEdge ${PCL_LIBRARIES} ANN ${OpenCV_LIBS} ${G2O_LIBS} data_reading plane_edge_extration plane_fitting motion_estimation backend)
